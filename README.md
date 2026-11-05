@@ -37,7 +37,7 @@ Use a mouse or touch, or focus the board and navigate with arrow keys. Enter or 
 
 ## Settings and accessibility
 
-Sound starts muted and uses locally synthesized Web Audio effects. The settings dialog controls sound, animation and dark/light appearance. The operating system's reduced-motion preference overrides enabled animations. Movement is locked during turn animations to keep state consistent. Balls have distinct markings as well as colors, cells have accessible labels, and turn results are announced through a live region.
+Sound is enabled for new players and starts after a user gesture. Local Web Audio synthesis provides a selection tap, movement glide, spawning pops, matching chime, blocked-move cue and game-over melody. Enabling sound plays a short confirmation; muting stops active effects and remains saved across reloads. Previously saved mute preferences are preserved. The settings dialog controls sound, animation and dark/light appearance. The operating system's reduced-motion preference overrides enabled animations. Movement is locked during turn animations to keep state consistent. Balls use clean glossy colors without symbols, cells retain accessible color labels, and turn results are announced through a live region.
 
 Preferences and personal best are stored locally under `linez.settings` and `linez.best`. Storage or audio failures do not prevent play. The current board is intentionally session-only; refreshing starts a new game.
 
@@ -45,6 +45,7 @@ Preferences and personal best are stored locally under `linez.settings` and `lin
 
 - `src/engine/`: pure rules, BFS, line detection, configurable scoring and seeded Mulberry32 randomness. The seed is carried in each immutable game snapshot.
 - `src/hooks/useGame.ts`: UI selection and animation sequencing around an atomic engine turn; one-step undo and reset.
+- `src/audio/soundEffects.ts`: distinct synthesized effects with pitch sweeps and volume envelopes.
 - `src/hooks/usePreferences.ts`, `useAudio.ts`: guarded local persistence, reduced-motion preference and synthesized effects.
 - `src/components/`: accessible board, balls, icons and native modal dialogs.
 - `src/styles/global.css`: responsive dark/light layout and reduced-motion-aware animations.

@@ -27,7 +27,7 @@ export function usePreferences() {
   const [preferences, setPreferences] = useState(() =>
     readStored<Preferences>(
       "linez.settings",
-      { sound: false, animations: true, theme: "dark" },
+      { sound: true, animations: true, theme: "dark" },
       (v): v is Preferences =>
         typeof v === "object" &&
         v !== null &&

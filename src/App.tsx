@@ -12,7 +12,7 @@ import {
 } from "./hooks/usePreferences";
 export default function App() {
   const { preferences, setPreferences, animate, reduced } = usePreferences();
-  const play = useAudio(preferences.sound);
+  const { play, preview } = useAudio(preferences.sound);
   const state = useGame(animate, play),
     { game } = state;
   const [best, setBest] = useState(() =>
@@ -38,7 +38,10 @@ export default function App() {
     state.restart();
     setModal(null);
   };
-  const changeSound = () => setPreferences((p) => ({ ...p, sound: !p.sound }));
+  const changeSound = () => {
+    if (!preferences.sound) preview();
+    setPreferences((p) => ({ ...p, sound: !p.sound }));
+  };
   const empty = game.board.filter((c) => !c).length;
   return (
     <div className="app-shell">

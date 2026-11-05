@@ -1,43 +1,62 @@
 import { useEffect, useRef } from "react";
-import type { Sound } from "./useGame";
-const notes: Record<Sound, number[]> = {
-  select: [520],
-  move: [330, 440],
-  spawn: [260, 330, 390],
-  match: [523, 659, 784, 1047],
-  over: [392, 330, 262],
-  invalid: [170],
-};
+import { scheduleSound, type Sound } from "../audio/soundEffects";
+
 export function useAudio(enabled: boolean) {
   const context = useRef<AudioContext | null>(null);
-  useEffect(
-    () => () => {
-      void context.current?.close();
+  const voices = useRef(new Set<OscillatorNode>());
+  const audible = useRef(enabled);
+  audible.current = enabled;
+
+  useEffect(() => {
+    if (!enabled) {
+      for (const voice of voices.current) voice.stop();
+      voices.current.clear();
+    }
+  }, [enabled]);
+  useEffect(() => {
+    const active = voices.current;
+    return () => {
+      active.clear();
+      const audio = context.current;
       context.current = null;
-    },
-    [],
-  );
-  return (kind: Sound) => {
-    if (!enabled) return;
+      if (audio && audio.state !== "closed")
+        void audio.close().catch(() => undefined);
+    };
+  }, []);
+
+  function play(kind: Sound) {
+    if (!audible.current) return;
     try {
       const audio = (context.current ??= new AudioContext());
-      void audio.resume().catch(() => undefined);
-      notes[kind].forEach((frequency, i) => {
-        const oscillator = audio.createOscillator(),
-          gain = audio.createGain(),
-          start = audio.currentTime + i * 0.065;
-        oscillator.type = "sine";
-        oscillator.frequency.value = frequency;
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(0.045, start + 0.012);
-        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.18);
-        oscillator.connect(gain);
-        gain.connect(audio.destination);
-        oscillator.start(start);
-        oscillator.stop(start + 0.2);
-      });
+      const schedule = () => {
+        // A pending browser unlock or a previous animation must not override mute.
+        if (
+          !audible.current ||
+          context.current !== audio ||
+          audio.state !== "running"
+        )
+          return;
+        for (const voice of scheduleSound(audio, audio.destination, kind)) {
+          voices.current.add(voice);
+          voice.addEventListener("ended", () => voices.current.delete(voice), {
+            once: true,
+          });
+        }
+      };
+      // Called directly from selection/toggle gestures so mobile browsers can unlock audio.
+      if (audio.state === "running") schedule();
+      else
+        void audio
+          .resume()
+          .then(schedule)
+          .catch(() => undefined);
     } catch {
-      /* Gameplay remains available without an audio device. */
+      // Audio support or a missing output device must never interrupt a game.
     }
-  };
+  }
+  function preview() {
+    audible.current = true;
+    play("select");
+  }
+  return { play, preview };
 }

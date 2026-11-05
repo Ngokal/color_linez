@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { move, newGame, undo } from "../engine/gameEngine";
 import type { Board, Color } from "../engine/types";
-export type Sound = "select" | "move" | "spawn" | "match" | "over" | "invalid";
+import type { Sound } from "../audio/soundEffects";
 export function useGame(animate: boolean, play: (sound: Sound) => void) {
   const [game, setGame] = useState(() =>
     newGame(crypto.getRandomValues(new Uint32Array(1))[0]),

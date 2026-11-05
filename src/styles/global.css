@@ -313,14 +313,7 @@ h1 em {
   transform: rotate(-30deg);
   filter: blur(0.4px);
 }
-.ball-mark {
-  color: #fff9;
-  font-size: clamp(10px, 1.5vw, 17px);
-  text-shadow: 0 1px 1px #0003;
-  font-weight: 500;
-  line-height: 1;
-  transform: translateY(10%);
-}
+
 .mint {
   --ball: #6ed4ab;
   --light: #d5ffdd;
@@ -1178,9 +1171,7 @@ kbd {
   .ball {
     width: 76%;
   }
-  .ball-mark {
-    font-size: 12px;
-  }
+
   .game-status {
     font-size: 10px;
     min-height: 43px;
@@ -1241,8 +1232,5 @@ kbd {
   }
   .score-details span {
     font-size: 6px;
-  }
-  .ball-mark {
-    font-size: 10px;
   }
 }
